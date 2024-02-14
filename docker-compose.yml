@@ -9,6 +9,11 @@ networks:
 # will contain all elasticsearch data.
 volumes:
   elasticsearch-data:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: './data/elasticsearch'
 
 secrets:
   elasticsearch.keystore:
@@ -74,7 +79,7 @@ services:
         soft: 200000
         hard: 200000
     healthcheck:
-      test: ["CMD", "sh", "-c", "curl -sf --insecure https://$ELASTIC_USERNAME:$ELASTIC_PASSWORD@localhost:$ELASTICSEARCH_PORT/_cat/health | grep -ioE 'green|yellow' || echo 'not green/yellow cluster status'"]
+      test: ["CMD", "sh", "-c", "curl -sf --insecure http://$ELASTIC_USERNAME:$ELASTIC_PASSWORD@localhost:$ELASTICSEARCH_PORT/_cat/health | grep -ioE 'green|yellow' || echo 'not green/yellow cluster status'"]
 
   logstash:
     image: elastdocker/logstash:${ELK_VERSION}
@@ -93,7 +98,7 @@ services:
     environment:
       ELASTIC_USERNAME: ${ELASTIC_USERNAME}
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
-      ELASTICSEARCH_HOST_PORT: https://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
+      ELASTICSEARCH_HOST_PORT: http://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
       LS_JAVA_OPTS: "-Xmx${LOGSTASH_HEAP} -Xms${LOGSTASH_HEAP} -Dlog4j2.formatMsgNoLookups=true"
     ports:
       - "5044:5044"
@@ -113,7 +118,7 @@ services:
     environment:
       ELASTIC_USERNAME: ${ELASTIC_USERNAME}
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
-      ELASTICSEARCH_HOST_PORT: https://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
+      ELASTICSEARCH_HOST_PORT: http://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
       KIBANA_PORT: ${KIBANA_PORT}
     env_file:
       - ./secrets/.env.kibana.token
@@ -135,14 +140,15 @@ services:
         ELK_VERSION: $ELK_VERSION
     restart: unless-stopped
     ports:
-      - "8200:8200"
+      - "${APMSERVER_PORT}:8200"
     volumes:
       - ./apm-server/config/apm-server.yml:/usr/share/apm-server/apm-server.yml:ro
     environment:
       ELASTIC_USERNAME: ${ELASTIC_USERNAME}
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
-      ELASTICSEARCH_HOST_PORT: https://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
+      ELASTICSEARCH_HOST_PORT: http://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
       ELASTIC_APM_SECRET_TOKEN: ${ELASTIC_APM_SECRET_TOKEN}
+      APMSERVER_PORT: ${APMSERVER_PORT}
     secrets:
       - source: elastic.ca
         target: /certs/ca.crt

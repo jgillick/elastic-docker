@@ -4,18 +4,17 @@
 
 apm-server:
   # Defines the host and port the server is listening on. Use "unix:/path/to.sock" to listen on a unix domain socket.
-  host: "0.0.0.0:8200"
-
+  host: "0.0.0.0:${APMSERVER_PORT}"
 
   #---------------------------- APM Server - Secure Communication with Agents ----------------------------
 
   # Enable authentication using Secret token
   auth:
-    secret_token: '${ELASTIC_APM_SECRET_TOKEN}'
+    secret_token: "${ELASTIC_APM_SECRET_TOKEN}"
 
   # Enable secure communication between APM agents and the server. By default ssl is disabled.
   ssl:
-    enabled: true
+    enabled: false
 
     # Path to file containing the certificate for server authentication.
     # Needs to be configured when ssl is enabled.
@@ -35,17 +34,17 @@ output.elasticsearch:
   # Scheme and port can be left out and will be set to the default (`http` and `9200`).
   # In case you specify and additional path, the scheme is required: `http://elasticsearch:9200/path`.
   # IPv6 addresses should always be defined as: `https://[2001:db8::1]:9200`.
-  hosts: '${ELASTICSEARCH_HOST_PORT}'
+  hosts: "${ELASTICSEARCH_HOST_PORT}"
 
   # Boolean flag to enable or disable the output module.
   enabled: true
 
   # Protocol - either `http` (default) or `https`.
-  protocol: "https"
+  protocol: "http"
 
   # Authentication credentials
-  username: '${ELASTIC_USERNAME}'
-  password: '${ELASTIC_PASSWORD}'
+  username: "${ELASTIC_USERNAME}"
+  password: "${ELASTIC_PASSWORD}"
 
   # Enable custom SSL settings. Set to false to ignore custom SSL settings for secure communication.
   ssl.enabled: true
@@ -74,19 +73,18 @@ monitoring.enabled: true
 # output configuration. This means that if you have the Elasticsearch output configured,
 # you can simply uncomment the following line.
 monitoring.elasticsearch:
-
   # Protocol - either `http` (default) or `https`.
-  protocol: "https"
+  protocol: "http"
 
   # Authentication credentials
-  username: '${ELASTIC_USERNAME}'
-  password: '${ELASTIC_PASSWORD}'
+  username: "${ELASTIC_USERNAME}"
+  password: "${ELASTIC_PASSWORD}"
 
   # Array of hosts to connect to.
   # Scheme and port can be left out and will be set to the default (`http` and `9200`).
   # In case you specify and additional path, the scheme is required: `http://elasticsearch:9200/path`.
   # IPv6 addresses should always be defined as: `https://[2001:db8::1]:9200`.
-  hosts: '${ELASTICSEARCH_HOST_PORT}'
+  hosts: "${ELASTICSEARCH_HOST_PORT}"
 
   # Enable custom SSL settings. Set to false to ignore custom SSL settings for secure communication.
   ssl.enabled: true
