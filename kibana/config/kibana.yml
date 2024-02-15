@@ -5,6 +5,7 @@
 server.name: kibana
 server.host: "0.0.0.0"
 server.port: ${KIBANA_PORT}
+server.publicBaseUrl: ${KIBANA_PUBLIC_URL}
 
 # Elasticsearch Connection
 elasticsearch.hosts: ["${ELASTICSEARCH_HOST_PORT}"]
